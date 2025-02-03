@@ -202,3 +202,114 @@ class InsertionSortAnimation(Scene):
         )
         self.play(cards.animate, run_time=1)
         self.wait(2)
+
+
+
+class SelectionSortAnimation(Scene):
+
+    def construct(self):
+        #initial settings
+        num_cards = 5
+        card_width = 1.0
+        card_height = 1.5
+        spacing = 0.2
+
+        cards_color = "#5F28C2"
+        
+        #values = [7, 6, 5, 4, 1]  #Fixed example for easier visualization
+        #Generate random numbers
+        values = random.sample(range(1, num_cards+1), num_cards)
+        
+        #Create cards
+        cards = VGroup(*[
+            VGroup(
+                Rectangle(width=card_width, height=card_height,
+                        fill_color=cards_color, fill_opacity=0.8,
+                        stroke_color=WHITE, stroke_width=4),
+                Text(str(n), font_size=36)
+            ).arrange(IN, buff=0.2)
+            for n in values
+        ])
+        
+        #Position cards
+        cards.arrange(RIGHT, buff=spacing).shift(UP*0.5)
+        
+        #Title
+        title = Text("Selection Sort", font_size=40).to_edge(UP)
+        self.add(title, cards)
+        self.wait(0.5)
+        
+        #Algorithm Selection Sort
+        n = len(values)
+        
+        for i in range(n):
+
+            #select key
+            self.play(
+                cards[i].animate.set_fill(RED),
+                run_time=0.5
+            )
+
+            key = i
+
+            for j in range(i + 1, n):
+
+                if values[j] < values[key]:
+                    key = j
+                    #Highlight elements being compared
+                    self.play(
+                        cards[j].animate.set_fill(YELLOW),
+                        cards[key].animate.set_fill(YELLOW),
+                        run_time=0.5
+                    )
+
+                    self.wait(1.0)
+
+
+                    #Reset card color
+                    self.play(
+                            cards[i].animate.set_fill(cards_color),
+                            cards[key].animate.set_fill(cards_color),
+                            run_time=0.5
+                    )
+
+
+            #Swap the found minimum element with the first element
+            values[i], values[key] = values[key], values[i]
+
+            #Swap card positions on screen
+            self.play(
+                cards[i].animate.move_to(cards[key].get_center()),
+                cards[key].animate.move_to(cards[i].get_center()),
+                run_time=1.0
+             )
+            self.wait(1.0)
+
+            #Swap card references in VGroup
+            cards[i], cards[key] = cards[key], cards[i]
+
+
+
+
+            #Reset key color
+            self.play(
+                cards[key].animate.set_fill(cards_color),
+                run_time=0.5
+            )
+            self.wait(0.2)
+
+            #Highlight ordered element
+            self.play(
+                cards[i].animate.set_fill(GREEN),
+                run_time=0.5
+            )
+
+        
+        #Highlight all ordered elements
+        self.play(
+            LaggedStart(*[card.animate.set_fill(GREEN) for card in cards], lag_ratio=0.2),
+            run_time=2
+        )
+        self.play(cards.animate, run_time=1)
+        self.wait(2)
+
