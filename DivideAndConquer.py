@@ -1,8 +1,5 @@
 from manim import *
 
-
-
-
 class DivideAndConquerMax(Scene):
     def construct(self):
         elements = [3, 1, 4, 2]
