@@ -1,4 +1,5 @@
 from manim import *
+from collections import deque
 import random
 
 class BubbleSortAnimation(Scene):
@@ -313,3 +314,51 @@ class SelectionSortAnimation(Scene):
         self.play(cards.animate, run_time=1)
         self.wait(2)
 
+
+
+class MergeSorting(Scene):
+    def construct(self):
+        n_lista = 4
+        items = np.arange(1, n_lista+1)
+
+        #Main table
+        main_table = IntegerTable([items], include_outer_lines=True)
+        main_table.scale(0.5)
+        main_table.move_to(UP * 3)
+        self.play(Write(main_table))
+
+        #Configuring the queue to process splits
+        queue = deque()
+        queue.append((0, n_lista-1, main_table.get_center(), 0))
+
+        #Spacing between levels
+        vertical_offset = 1.5
+        horizontal_offset = 2.0
+
+        while queue:
+            start, end, position, depth = queue.popleft()
+            
+            #Do not split single lists
+            if start >= end:
+                continue
+
+            mid = (start + end) // 2
+
+            #Left table
+            left_items = items[start:mid+1]
+            left_table = IntegerTable([left_items], include_outer_lines=True)
+            left_table.scale(0.5)
+            left_pos = position + (LEFT * horizontal_offset/(2**depth) + DOWN * vertical_offset)
+            left_table.move_to(left_pos)
+
+            #Right table
+            right_items = items[mid+1:end+1]
+            right_table = IntegerTable([right_items], include_outer_lines=True)
+            right_table.scale(0.5)
+            right_pos = position + (RIGHT * horizontal_offset/(2**depth) + DOWN * vertical_offset)
+            right_table.move_to(right_pos)
+
+            #Animate and add to queue
+            self.play(Write(left_table), Write(right_table))
+            queue.append((start, mid, left_table.get_center(), depth + 1))
+            queue.append((mid + 1, end, right_table.get_center(), depth + 1))
